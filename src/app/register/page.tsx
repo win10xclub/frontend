@@ -18,7 +18,7 @@ function RegisterPage() {
 
     const onRegister = async () => {
         try {
-            const response = await axios.post('http://localhost:8080/api/v1/register', details, {
+            const response = await axios.post('http://localhost:8080/api/user/signup', details, {
                 withCredentials: true,
               });
             console.log('Registration successful:', response.data);
