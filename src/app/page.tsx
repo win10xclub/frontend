@@ -1,12 +1,28 @@
 "use client";
 import CustomButton from "@/components/CustomButton";
 import Image from "next/image";
-import { useState } from "react";
-import JoinRoom from "./(form)/joinRoom";
+import { MouseEvent, useState } from "react";
 import CreateRoom from "./(form)/CreateRoom";
+import JoinRoom from "./(form)/JoinRoom";
+import axios from "axios";
 
 export default function Home() {
   const [mode, setMode] = useState("");
+
+  const onJoinRandom = async () => {
+    try {
+      const response = await axios.post(
+        "http://localhost:8080/api/play/joinrandom",
+        
+        {
+          withCredentials: true,
+        }
+      );
+      console.log("Room joined successful:", response.data);
+    } catch (error) {
+      console.error("Error joining room:", error);
+    }
+  }
 
   return (
     <div className="max-w-[24rem] mx-auto mt-[4rem] flex flex-col gap-[1rem]">
@@ -18,7 +34,7 @@ export default function Home() {
         <>
           <CustomButton
             label="Join Game"
-            onClick={(e) => setMode("join")}
+            onClick={onJoinRandom}
           ></CustomButton>
           <div className="w-[100%] h-[0.1rem] bg-yellow-400"></div>
           <CustomButton
@@ -31,6 +47,7 @@ export default function Home() {
           ></CustomButton>
         </>
       )}
+      {mode && <CustomButton label="Back" onClick={() => setMode("")} />}
     </div>
   );
 }

@@ -6,11 +6,11 @@ import React, { useState } from "react";
 
 function CreateRoom() {
   const [details, setDetails] = useState({
-    gameType: '',
-    maxScore: '',
-    time: '',
-    gameMode: '',
-    maxPlayers: ''
+    game_type: 'max_score',
+    score: '50',
+    timer: '30',
+    game_mode: 'public',
+    max_players: '4'
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -53,7 +53,7 @@ function CreateRoom() {
   const onSubmit = async () => {
     try {
       const response = await axios.post(
-        "http://localhost:8080/api/user/signin",
+        "http://localhost:8080/api/play/hostgame",
         details,
         {
           withCredentials: true,
@@ -73,7 +73,7 @@ function CreateRoom() {
         name="gameType"
         id="gameType"
         onChange={handleChange}
-        value={details.gameType}
+        value={details.game_type}
       />
       <CustomOptionInput
         label="Max-Score"
@@ -81,7 +81,7 @@ function CreateRoom() {
         name="maxScore"
         id="maxScore"
         onChange={handleChange}
-        value={details.maxScore}
+        value={details.score}
       />
       <CustomOptionInput
         label="Auto-Play Timeout"
@@ -89,7 +89,7 @@ function CreateRoom() {
         name="time"
         id="time"
         onChange={handleChange}
-        value={details.time}
+        value={details.timer}
       />
       <CustomOptionInput
         label="Game Mode"
@@ -97,7 +97,7 @@ function CreateRoom() {
         name="gameMode"
         id="gameMode"
         onChange={handleChange}
-        value={details.gameMode}
+        value={details.game_mode}
       />
       <CustomOptionInput
         label="Max players"
@@ -105,7 +105,7 @@ function CreateRoom() {
         name="maxPlayers"
         id="maxPlayers"
         onChange={handleChange}
-        value={details.maxPlayers}
+        value={details.max_players}
       />
        <CustomButton label="Create a Room" onClick={onSubmit}></CustomButton>
     </div>
