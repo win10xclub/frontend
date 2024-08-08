@@ -4,6 +4,8 @@ import axios from "axios";
 import CustomInput from "@/components/CustomInput";
 import CustomButton from "@/components/CustomButton";
 import Link from "next/link";
+import CustomCheckBox from "@/components/CustomCheckBox";
+import NavbarLayout from "@/components/NavbarLayout";
 
 function SignupPage() {
   const [details, setDetails] = useState({
@@ -35,7 +37,9 @@ function SignupPage() {
   };
 
   return (
-    <div className="mt-[4rem] mx-auto max-w-[24rem] flex flex-col gap-[1rem]">
+    <NavbarLayout>
+    <div className="mt-[4rem] w-[100%] max-w-[24rem] flex flex-col gap-[1rem] bg-secnColor px-[1.5rem] py-[2rem] rounded-[1rem] text-textColor">
+      <h1 className="text-[1.5rem] font-bold">Create an Account !</h1>
       <CustomInput
         type="email"
         name="email"
@@ -52,14 +56,28 @@ function SignupPage() {
         onChange={handleChange}
         label="Password"
       />
+      <div className="flex justify-between items-center text-14px">
+        <CustomCheckBox label={"Remember me"} value={false}></CustomCheckBox>
+        {/* <Link
+          className="underline underline-offset-2 text-[14px] text-accColor"
+          href={"/forgotpassword"}
+        >
+          Forgot Password ?
+        </Link> */}
+      </div>
+
       <CustomButton label="Signup" onClick={onSignup}></CustomButton>
       <p className="text-[14px] text-center">
-        New to here ?{" "}
-        <Link className="underline underline-offset-2" href={"/signin"}>
-          Signin
+        Already been here ?
+        <Link
+          className="underline underline-offset-2 text-accColor pl-[0.5rem]"
+          href={"/signin"}
+        >
+          log back
         </Link>
       </p>
     </div>
+  </NavbarLayout>
   );
 }
 
