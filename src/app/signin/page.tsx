@@ -4,6 +4,7 @@ import axios from "axios";
 import CustomInput from "@/components/CustomInput";
 import CustomButton from "@/components/CustomButton";
 import Link from "next/link";
+import CustomCheckBox from "@/components/CustomCheckBox";
 
 function SigninPage() {
   const [details, setDetails] = useState({
@@ -35,7 +36,8 @@ function SigninPage() {
   };
 
   return (
-    <div className="mt-[4rem] mx-auto max-w-[24rem] flex flex-col gap-[1rem]">
+    <div className="mt-[4rem] mx-auto max-w-[24rem] flex flex-col gap-[1rem] bg-secnColor px-[1.5rem] py-[2rem] rounded-[1rem] text-textColor">
+      <h1 className="text-[1.5rem] font-bold">Welcome Back !</h1>
       <CustomInput
         type="email"
         name="email"
@@ -52,11 +54,24 @@ function SigninPage() {
         onChange={handleChange}
         label="Password"
       />
+      <div className="flex justify-between items-center text-14px">
+        <CustomCheckBox label={"Remember me"} value={false}></CustomCheckBox>
+      <Link
+          className="underline underline-offset-2 text-[14px] text-accColor"
+          href={"/forgotpassword"}
+        >
+          Forgot Password ?
+        </Link>
+      </div>
+      
       <CustomButton label="Signin" onClick={onSignup}></CustomButton>
       <p className="text-[14px] text-center">
-        New to here ?{" "}
-        <Link className="underline underline-offset-2" href={"/signup"}>
-          Signup
+        Not registered?
+        <Link
+          className="underline underline-offset-2 text-accColor pl-[0.5rem]"
+          href={"/signup"}
+        >
+          Create account
         </Link>
       </p>
     </div>
