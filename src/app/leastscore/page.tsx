@@ -13,8 +13,8 @@ const LeastScorePage = () => {
         <div className="w-[100%] bg-secnColor h-[10rem] rounded-[12px] flex flex-col justify-center items-center gap-[1rem]">
           <CustomButton label={"Online Play"}></CustomButton>
           <div className="flex gap-[1rem]">
-            <CustomButton label={"Create Room"}></CustomButton>
-            <CustomButton label={"Join Room"}></CustomButton>
+            <CustomButton label={"Create Room"} style="secondary"></CustomButton>
+            <CustomButton label={"Join Room"} style="secondary"></CustomButton>
           </div>
         </div>
         {/* <div
