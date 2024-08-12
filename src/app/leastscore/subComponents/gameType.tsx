@@ -3,25 +3,30 @@ import React from "react";
 
 const GameType = ({ setStepper }: any) => {
   // Define the function to handle the click event
-  const handleClick = () => {
-    setStepper((prev: number) => prev + 1); // Increment the stepper value
+  const handleClick = (increment: number) => {
+    setStepper((prev: number) => prev + increment); // Increment the stepper value
   };
 
   return (
-    <div className="w-[100%] bg-secnColor h-[10rem] rounded-[12px] flex flex-col justify-center items-center gap-[1rem]">
-      <CustomButton label={"Online Play"}></CustomButton>
-      <div className="flex gap-[1rem]">
+    <>
+      <CustomButton
+        label={"Online Play"}
+        style="primary"
+        onClick={() => handleClick(2)} // Add +2 for Online Play
+      />
+      <div className="flex gap-4">
         <CustomButton
           label={"Create Room"}
           style="secondary"
-          onClick={handleClick} // Use the function here
-        ></CustomButton>
+          onClick={() => handleClick(1.1)} // Add +1.1 for Create Room
+        />
         <CustomButton
           label={"Join Room"}
           style="secondary"
-        ></CustomButton>
+          onClick={() => handleClick(1.2)} // Add +1.2 for Join Room
+        />
       </div>
-    </div>
+    </>
   );
 };
 

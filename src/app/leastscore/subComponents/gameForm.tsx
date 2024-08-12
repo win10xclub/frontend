@@ -1,77 +1,116 @@
-import CustomButton from '@/components/CustomButton';
-import CustomOptionInput from '@/components/CustomOptionInput';
-import React, { useState } from 'react'
+import CustomButton from "@/components/CustomButton";
+import CustomInput from "@/components/CustomInput";
+import CustomOptionInput from "@/components/CustomOptionInput";
+import { ArrowLeft } from "@phosphor-icons/react";
+import React, { useState } from "react";
 
-const GameForm = ({ setStepper }: any) => {
+const GameForm = ({ stepper, setStepper }: any) => {
+  const [selectedValue, setSelectedValue] = useState({
+    game_type: "",
+    timer: "30",
+    game_mode: "public",
+    score: "50",
+    max_players: "3",
+  });
 
-    const [selectedValue, setSelectedValue] = useState({
-        gameType: "",
-        visibility: "", // Fixed typo here
-      });
-    
-      const options = {
-        gameType: [
-          {
-            value: "knockout",
-            label: "KnockOut",
-          },
-          {
-            value: "maxscore",
-            label: "Max Score",
-          },
-        ],
-        visibility: [
-          // Fixed typo here
-          {
-            value: "public",
-            label: "Public",
-          },
-          {
-            value: "private",
-            label: "Private",
-          },
-        ],
-      };
-    
-      const handleChange = (
-        e: React.ChangeEvent<HTMLSelectElement>,
-        field: keyof typeof selectedValue
-      ) => {
-        const newValue = e.target.value;
-        setSelectedValue((prev) => ({
-          ...prev,
-          [field]: newValue,
-        }));
-        console.log(`Selected ${field}:`, newValue);
-      };
+  const options = {
+    gameType: [
+      { value: "knockout", label: "KnockOut" },
+      { value: "max_score", label: "Max Score" },
+    ],
+    game_mode: [
+      { value: "public", label: "Public" },
+      { value: "private", label: "Private" },
+    ],
+    timer: [
+      { value: "30", label: "30" },
+      { value: "60", label: "60" },
+      { value: "NA", label: "No Time Limit" },
+    ],
+    score: [
+      { value: "50", label: "50" },
+      { value: "100", label: "100" },
+    ],
+    max_players: [
+      { value: "2", label: "2" },
+      { value: "3", label: "3" },
+      { value: "4", label: "4" },
+    ],
+  };
 
-      const handleClick = () => {
-        setStepper((prev: number) => prev + 1); // Increment the stepper value
-      };
+  const handleChange = (
+    e: React.ChangeEvent<HTMLSelectElement>,
+    field: keyof typeof selectedValue
+  ) => {
+    const newValue = e.target.value;
+    setSelectedValue((prev) => ({
+      ...prev,
+      [field]: newValue,
+    }));
+    console.log(`Selected ${field}:`, newValue);
+  };
+
+  const handleClick = () => {
+    setStepper((prev: number) => prev + 1); // Increment the stepper value
+  };
 
   return (
-    <div className="w-[100%] bg-secnColor h-[20rem] rounded-[12px] flex flex-col justify-center items-center gap-[1rem]">
+    <>
+      <button className="absolute left-[1rem] top-[1rem] bg-terColor rounded-[8px] px-[1rem] py-[0.5rem]" onClick={() => setStepper(0)}>
+        <ArrowLeft size={20} />
+      </button>
+      {stepper == 1.1 ? (
+        <>
           <CustomOptionInput
             label={"Game Type"}
             options={options.gameType}
             name={"game_type"}
             id={"game_type"}
-            value={selectedValue.gameType}
-            onChange={(e) => handleChange(e, "gameType")}
+            value={selectedValue.game_type}
+            onChange={(e) => handleChange(e, "game_type")}
           />
           <CustomOptionInput
-            label={"Visibility"} // Fixed typo here
-            options={options.visibility} // Fixed typo here
-            name={"visibility"}
-            id={"visibility"}
-            value={selectedValue.visibility} // Fixed typo here
-            onChange={(e) => handleChange(e, "visibility")}
+            label={"Game Mode"}
+            options={options.game_mode}
+            name={"game_mode"}
+            id={"game_mode"}
+            value={selectedValue.game_mode}
+            onChange={(e) => handleChange(e, "game_mode")}
           />
-           <CustomButton label={'Create'} onClick={handleClick}></CustomButton>
-        </div>
+          <CustomOptionInput
+            label={"Timer"}
+            options={options.timer}
+            name={"timer"}
+            id={"timer"}
+            value={selectedValue.timer}
+            onChange={(e) => handleChange(e, "timer")}
+          />
+          <CustomOptionInput
+            label={"Score"}
+            options={options.score}
+            name={"score"}
+            id={"score"}
+            value={selectedValue.score}
+            onChange={(e) => handleChange(e, "score")}
+          />
+          <CustomOptionInput
+            label={"Max Players"}
+            options={options.max_players}
+            name={"max_players"}
+            id={"max_players"}
+            value={selectedValue.max_players}
+            onChange={(e) => handleChange(e, "max_players")}
+          />
+          <CustomButton label={"Create"} onClick={handleClick} />
+        </>
+      ) : (
+        <>
+          <CustomInput label={"Enter Room ID"} type={"text"}></CustomInput>
+          <CustomButton label={"Create"} onClick={handleClick} />
+        </>
+      )}
+    </>
+  );
+};
 
-       
-  )
-}
-
-export default GameForm
+export default GameForm;
