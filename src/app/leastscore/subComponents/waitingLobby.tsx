@@ -1,8 +1,11 @@
+import CustomButton from '@/components/CustomButton'
 import React from 'react'
 
 const WaitingLobby = () => {
   return (
-    <div>WaitingLobby</div>
+   <>
+      <CustomButton label={"Start"} />
+   </>
   )
 }
 

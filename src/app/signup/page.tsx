@@ -6,31 +6,43 @@ import CustomButton from "@/components/CustomButton";
 import Link from "next/link";
 import CustomCheckBox from "@/components/CustomCheckBox";
 import NavbarLayout from "@/components/NavbarLayout";
+import { useRouter } from "next/navigation";
 
 function SignupPage() {
   const [details, setDetails] = useState({
+    username: "",
     email: "",
     password: "",
   });
 
-  const handleChange = (e: { target: { name: any; value: any } }) => {
-    const { name, value } = e.target;
+  const [rememberMe, setRememberMe] = useState(false);
+  const router = useRouter();
+  const [otpVisble, setOtpVisible] = useState(true);
+  const [otpField, setOtpField] = useState("");
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { id, value } = e.target;
     setDetails((prevDetails) => ({
       ...prevDetails,
-      [name]: value,
+      [id]: value,
     }));
+  };
+
+  const handleCheckBoxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setRememberMe(e.target.checked);
   };
 
   const onSignup = async () => {
     try {
       const response = await axios.post(
-        "http://localhost:8080/api/user/signup",
+        `http://${process.env.NEXT_PUBLIC_AUTH_API_URL}/api/user/signup`,
         details,
         {
           withCredentials: true,
         }
       );
       console.log("Registration successful:", response.data);
+      router.push("/leastscore");
     } catch (error) {
       console.error("Error registering:", error);
     }
@@ -38,46 +50,61 @@ function SignupPage() {
 
   return (
     <NavbarLayout>
-    <div className="mt-[4rem] w-[100%] max-w-[24rem] flex flex-col gap-[1rem] bg-secnColor px-[1.5rem] py-[2rem] rounded-[1rem] text-textColor">
-      <h1 className="text-[1.5rem] font-bold">Create an Account !</h1>
-      <CustomInput
-        type="email"
-        name="email"
-        placeholder="email"
-        value={details.email}
-        onChange={handleChange}
-        label="Email"
-      ></CustomInput>
-      <CustomInput
-        type="password"
-        name="password"
-        placeholder="password"
-        value={details.password}
-        onChange={handleChange}
-        label="Password"
-      />
-      <div className="flex justify-between items-center text-14px">
-        <CustomCheckBox label={"Remember me"} value={false}></CustomCheckBox>
-        {/* <Link
-          className="underline underline-offset-2 text-[14px] text-accColor"
-          href={"/forgotpassword"}
-        >
-          Forgot Password ?
-        </Link> */}
+      <div className="mt-16 w-full max-w-md flex flex-col gap-4 bg-secnColor px-6 py-8 rounded-lg text-textColor">
+        <h1 className="text-xl font-bold">Create an Account!</h1>
+        <CustomInput
+          type="text"
+          name="username"
+          placeholder="Username"
+          value={details.username}
+          onChange={handleChange}
+          label="Username"
+        />
+        <CustomInput
+          type="email"
+          name="email"
+          placeholder="Email"
+          value={details.email}
+          onChange={handleChange}
+          label="Email"
+        />
+        <CustomInput
+          type="password"
+          name="password"
+          placeholder="Password"
+          value={details.password}
+          onChange={handleChange}
+          label="Password"
+        />
+        {otpVisble ?<div className="flex justify-between items-center text-sm">
+          <CustomCheckBox
+            label="Remember me"
+            value={rememberMe}
+            onChange={handleCheckBoxChange}
+          />
+          {/* Uncomment if needed */}
+          {/* <Link className="underline text-sm text-accColor" href="/forgotpassword">
+            Forgot Password?
+          </Link> */}
+        </div> : (
+          <CustomInput
+            type="text"
+            name="otp"
+            placeholder="otp"
+            value={otpField}
+            onChange={(e) => setOtpField(e.target.value)}
+            label="OTP"
+          />
+        )}
+        <CustomButton label="Signup" onClick={onSignup} />
+        <p className="text-sm text-center">
+          Already have an account?
+          <Link className="underline text-accColor pl-2" href="/signin">
+            Log in
+          </Link>
+        </p>
       </div>
-
-      <CustomButton label="Signup" onClick={onSignup}></CustomButton>
-      <p className="text-[14px] text-center">
-        Already been here ?
-        <Link
-          className="underline underline-offset-2 text-accColor pl-[0.5rem]"
-          href={"/signin"}
-        >
-          log back
-        </Link>
-      </p>
-    </div>
-  </NavbarLayout>
+    </NavbarLayout>
   );
 }
 

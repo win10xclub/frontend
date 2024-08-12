@@ -2,6 +2,7 @@ import CustomButton from "@/components/CustomButton";
 import CustomInput from "@/components/CustomInput";
 import CustomOptionInput from "@/components/CustomOptionInput";
 import { ArrowLeft } from "@phosphor-icons/react";
+import axios from "axios";
 import React, { useState } from "react";
 
 const GameForm = ({ stepper, setStepper }: any) => {
@@ -12,6 +13,8 @@ const GameForm = ({ stepper, setStepper }: any) => {
     score: "50",
     max_players: "3",
   });
+
+  const [code, setCode] = useState("");
 
   const options = {
     gameType: [
@@ -50,13 +53,42 @@ const GameForm = ({ stepper, setStepper }: any) => {
     console.log(`Selected ${field}:`, newValue);
   };
 
-  const handleClick = () => {
-    setStepper((prev: number) => prev + 1); // Increment the stepper value
+  const createRoom = async () => {
+    try {
+      const res = await axios.post(
+        `http://${process.env.NEXT_PUBLIC_GAMEROOM_API_URL}/api/play/hostgame`,
+        selectedValue,
+        {
+          withCredentials: true,
+        }
+      );
+      setStepper((prev: number) => prev + 1);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const joinRoom = async () => {
+    try {
+      const res = await axios.post(
+        `http://${process.env.NEXT_PUBLIC_GAMEROOM_API_URL}/api/play/joinbyid`,
+        { code: code },
+        {
+          withCredentials: true,
+        }
+      );
+      setStepper((prev: number) => prev + 1);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (
     <>
-      <button className="absolute left-[1rem] top-[1rem] bg-terColor rounded-[8px] px-[1rem] py-[0.5rem]" onClick={() => setStepper(0)}>
+      <button
+        className="absolute left-[1rem] top-[1rem] bg-terColor rounded-[8px] px-[1rem] py-[0.5rem]"
+        onClick={() => setStepper(0)}
+      >
         <ArrowLeft size={20} />
       </button>
       {stepper == 1.1 ? (
@@ -101,12 +133,16 @@ const GameForm = ({ stepper, setStepper }: any) => {
             value={selectedValue.max_players}
             onChange={(e) => handleChange(e, "max_players")}
           />
-          <CustomButton label={"Create"} onClick={handleClick} />
+          <CustomButton label={"Create"} onClick={createRoom} />
         </>
       ) : (
         <>
-          <CustomInput label={"Enter Room ID"} type={"text"}></CustomInput>
-          <CustomButton label={"Create"} onClick={handleClick} />
+          <CustomInput
+            label={"Enter Room ID"}
+            onChange={(e) => setCode(e.target.value)}
+            type={"text"}
+          ></CustomInput>
+          <CustomButton label={"Create"} onClick={joinRoom} />
         </>
       )}
     </>

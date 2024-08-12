@@ -2,7 +2,7 @@ import React from "react";
 
 interface CustomInputProps {
   label: string;
-  type: string;
+  type: string; // Ensure type is a valid HTML input type
   name?: string;
   placeholder?: string;
   value?: string;
@@ -28,9 +28,8 @@ const CustomInput: React.FC<CustomInputProps> = ({
       <input
         type={type}
         id={name}
-        aria-describedby="helper-text-explanation"
         value={value}
-        className="bg-terColor border border-gray-600 text-textColor text-sm rounded-lg focus:ring-accColor focus:border-accColor block w-full p-2.5"
+        className="bg-terColor border border-gray-600 text-textColor text-sm rounded-lg focus:ring-accColor focus:border-accColor w-full p-2.5"
         placeholder={placeholder}
         onChange={onChange}
       />
