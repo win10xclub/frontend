@@ -39,7 +39,6 @@ function AuthPage() {
 
   const handleAuth = async () => {
     try {
-      setOtpVisible(true);
       const url =
         authType === "signin"
           ? `http://${process.env.NEXT_PUBLIC_AUTH_API_URL}/api/user/signin`
@@ -62,6 +61,7 @@ function AuthPage() {
         `${authType === "signin" ? "Signin" : "Signup"} successful:`,
         response.data
       );
+      setOtpVisible(true);
     } catch (error) {
       console.error(
         `Error ${authType === "signin" ? "signing in" : "registering"}:`,
@@ -72,10 +72,7 @@ function AuthPage() {
 
   const handleOtpValidation = async () => {
     try {
-      const url =
-        authType === "signin"
-          ? `http://${process.env.NEXT_PUBLIC_AUTH_API_URL}/api/user/validate-signin-otp`
-          : `http://${process.env.NEXT_PUBLIC_AUTH_API_URL}/api/user/validate-signup-otp`;
+      const url = `http://${process.env.NEXT_PUBLIC_AUTH_API_URL}/api/user/check`;
 
       const response = await axios.post(
         url,
