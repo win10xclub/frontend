@@ -76,7 +76,10 @@ function AuthPage() {
 
       const response = await axios.post(
         url,
-        { otp: formDetails.otp },
+        { 
+          username: formDetails.username,
+          otp: formDetails.otp 
+        },
         {
           withCredentials: true,
         }
