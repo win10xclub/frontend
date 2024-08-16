@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import GameType from "./subComponents/gameType";
 import GameForm from "./subComponents/gameForm";
 import WaitingLobby from "./subComponents/waitingLobby";
+import GameBoardPage from "./subComponents/gameBoard";
 
 const LeastScorePage = () => {
   const [stepper, setStepper] = useState(0);
@@ -32,7 +33,9 @@ const LeastScorePage = () => {
 
           {(stepper == 1.1 || stepper == 1.2) && <GameForm stepper={stepper} setStepper={setStepper}></GameForm>}
 
-          {stepper >= 2 && <WaitingLobby></WaitingLobby>}
+          {(stepper >= 2 && stepper < 3) && <WaitingLobby></WaitingLobby>}
+
+          {stepper == 3 && <GameBoardPage></GameBoardPage>}
         </div>
       </div>
     </NavbarLayout>
