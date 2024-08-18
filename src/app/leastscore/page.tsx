@@ -28,7 +28,7 @@ const LeastScorePage = () => {
           }}
         ></div> */}
 
-        <div className="relative w-full bg-secnColor min-h-80 rounded-[1rem] flex flex-col justify-center items-center gap-4 p-[1rem]">
+        <div className="relative w-full bg-secnColor min-h-[10rem] rounded-[1rem] flex flex-col justify-center items-center gap-4 p-[0.25rem] mobile:p-[1rem]">
           {stepper == 0 && <GameType setStepper={setStepper}></GameType>}
 
           {(stepper == 1.1 || stepper == 1.2) && <GameForm stepper={stepper} setStepper={setStepper}></GameForm>}
