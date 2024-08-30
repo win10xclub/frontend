@@ -9,9 +9,42 @@ import GameBoardPage from "./subComponents/gameBoard";
 const LeastScorePage = () => {
   const [stepper, setStepper] = useState(0);
 
+  const [socket, setSocket] = useState<WebSocket | null>(null);
+
   useEffect(() => {
-    console.log(stepper);
-  }, [stepper]);
+    const newSocket = new WebSocket(`ws://localhost:8080`);
+
+    newSocket.onopen = () => {
+      console.log("WebSocket connection established");
+    };
+
+    newSocket.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      console.log("Response received:", data);
+
+      if (data.success === true) {
+        localStorage.setItem("gameId", data.gameid);
+        setStepper((prev: number) => prev + 1);
+      } else if (data.type === "error") {
+        console.error(data.message);
+      }
+    };
+
+    newSocket.onerror = (error) => {
+      console.error("WebSocket error:", error);
+    };
+
+    newSocket.onclose = () => {
+      console.log("WebSocket connection closed");
+    };
+
+    setSocket(newSocket);
+
+    // Cleanup function to close WebSocket when component unmounts
+    return () => {
+      newSocket.close();
+    };
+  }, []);
 
   return (
     <NavbarLayout>
@@ -20,22 +53,19 @@ const LeastScorePage = () => {
           <h3>LeastScore</h3>
         </div>
 
-        {/* <div
-          className="w-[100%] h-[10rem] rounded-[12px]"
-          style={{
-            background:
-              "radial-gradient(circle, rgba(35,133,35,1) 30%, rgba(22,54,37,1) 100%)",
-          }}
-        ></div> */}
-
         <div className="relative w-full bg-secnColor min-h-[10rem] rounded-[1rem] flex flex-col justify-center items-center gap-4 p-[0.25rem] mobile:p-[1rem]">
-          {stepper == 0 && <GameType setStepper={setStepper}></GameType>}
-
-          {(stepper == 1.1 || stepper == 1.2) && <GameForm stepper={stepper} setStepper={setStepper}></GameForm>}
-
-          {(stepper >= 2 && stepper < 3) && <WaitingLobby></WaitingLobby>}
-
-          {stepper == 3 && <GameBoardPage></GameBoardPage>}
+          {stepper === 0 && <GameType setStepper={setStepper}></GameType>}
+          {(stepper === 1.1 || stepper === 1.2) && (
+            <GameForm
+              stepper={stepper}
+              setStepper={setStepper}
+              socket={socket}  // Pass the socket prop here
+            />
+          )}
+          {stepper >= 2 && stepper < 3 && (
+            <WaitingLobby setStepper={setStepper} socket={socket} />
+          )}
+          {stepper === 3 && <GameBoardPage />}
         </div>
       </div>
     </NavbarLayout>

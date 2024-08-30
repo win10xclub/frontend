@@ -1,15 +1,27 @@
-import CustomButton from '@/components/CustomButton'
-import React from 'react'
+"use client";
 
-const WaitingLobby = () => {
+import CustomButton from "@/components/CustomButton";
+import React from "react";
 
-  
-
-  return (
-   <>
-      <CustomButton label={"Start"} />
-   </>
-  )
+interface WaitingLobbyProps {
+  socket: WebSocket;
+  setStepper: React.Dispatch<React.SetStateAction<number>>;
 }
 
-export default WaitingLobby
+const WaitingLobby: React.FC<WaitingLobbyProps> = ({ socket, setStepper }) => {
+  const startGame = () => {
+    if (socket) {
+      socket.send(JSON.stringify({ type: "start_game", username: "YourUsername" }));
+      console.log("Start game message sent to the server");
+    }
+  };
+
+  return (
+    <>
+      
+      <CustomButton label={"Start"} onClick={startGame} />
+    </>
+  );
+};
+
+export default WaitingLobby;

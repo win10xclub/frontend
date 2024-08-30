@@ -1,11 +1,12 @@
+"use client";
+
 import CustomButton from "@/components/CustomButton";
 import CustomInput from "@/components/CustomInput";
 import CustomOptionInput from "@/components/CustomOptionInput";
 import { ArrowLeft } from "@phosphor-icons/react";
-import axios from "axios";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
-const GameForm = ({ stepper, setStepper }: any) => {
+const GameForm = ({ stepper, setStepper, socket }: any) => {
   const [selectedValue, setSelectedValue] = useState({
     game_type: "",
     timer: "30",
@@ -17,7 +18,7 @@ const GameForm = ({ stepper, setStepper }: any) => {
   const [code, setCode] = useState("");
 
   const options = {
-    gameType: [
+    game_type: [
       { value: "knockout", label: "KnockOut" },
       { value: "max_score", label: "Max Score" },
     ],
@@ -53,35 +54,42 @@ const GameForm = ({ stepper, setStepper }: any) => {
     console.log(`Selected ${field}:`, newValue);
   };
 
-  const createRoom = async () => {
-    try {
-      const res = await axios.post(
-        `http://${process.env.NEXT_PUBLIC_GAMEROOM_API_URL}/api/play/hostgame`,
-        selectedValue,
-        {
-          withCredentials: true,
-        }
-      );
-      setStepper((prev: number) => prev + 1);
-    } catch (error) {
-      console.log(error);
+  const createRoom = () => {
+    if (socket) {
+      const data = {
+        type: "hostgame",
+        hostData: selectedValue,
+        username: "YourUsername",
+      };
+      socket.send(JSON.stringify(data));
+      console.log("Create room data sent to server:", data);
     }
   };
 
-  const joinRoom = async () => {
-    try {
-      const res = await axios.post(
-        `http://${process.env.NEXT_PUBLIC_GAMEROOM_API_URL}/api/play/joinbyid`,
-        { code: code },
-        {
-          withCredentials: true,
-        }
-      );
-      setStepper((prev: number) => prev + 1);
-    } catch (error) {
-      console.log(error);
+  const joinRoom = () => {
+    if (socket) {
+      const data = {
+        type: "joingame",
+        joinData: code,
+        username: "YourUsername",
+      };
+      socket.send(JSON.stringify(data));
+      console.log("Join room data sent to server:", data);
     }
   };
+
+  const renderOptionInputs = () =>
+    Object.keys(options).map((key) => (
+      <CustomOptionInput
+        key={key}
+        label={key.replace(/_/g, " ")}
+        options={options[key as keyof typeof options]}
+        name={key}
+        id={key}
+        value={selectedValue[key as keyof typeof selectedValue]}
+        onChange={(e) => handleChange(e, key as keyof typeof selectedValue)}
+      />
+    ));
 
   return (
     <>
@@ -91,48 +99,9 @@ const GameForm = ({ stepper, setStepper }: any) => {
       >
         <ArrowLeft size={20} />
       </button>
-      {stepper == 1.1 ? (
+      {stepper === 1.1 ? (
         <>
-          <CustomOptionInput
-            label={"Game Type"}
-            options={options.gameType}
-            name={"game_type"}
-            id={"game_type"}
-            value={selectedValue.game_type}
-            onChange={(e) => handleChange(e, "game_type")}
-          />
-          <CustomOptionInput
-            label={"Game Mode"}
-            options={options.game_mode}
-            name={"game_mode"}
-            id={"game_mode"}
-            value={selectedValue.game_mode}
-            onChange={(e) => handleChange(e, "game_mode")}
-          />
-          <CustomOptionInput
-            label={"Timer"}
-            options={options.timer}
-            name={"timer"}
-            id={"timer"}
-            value={selectedValue.timer}
-            onChange={(e) => handleChange(e, "timer")}
-          />
-          <CustomOptionInput
-            label={"Score"}
-            options={options.score}
-            name={"score"}
-            id={"score"}
-            value={selectedValue.score}
-            onChange={(e) => handleChange(e, "score")}
-          />
-          <CustomOptionInput
-            label={"Max Players"}
-            options={options.max_players}
-            name={"max_players"}
-            id={"max_players"}
-            value={selectedValue.max_players}
-            onChange={(e) => handleChange(e, "max_players")}
-          />
+          {renderOptionInputs()}
           <CustomButton label={"Create"} onClick={createRoom} />
         </>
       ) : (
@@ -141,8 +110,8 @@ const GameForm = ({ stepper, setStepper }: any) => {
             label={"Enter Room ID"}
             onChange={(e) => setCode(e.target.value)}
             type={"text"}
-          ></CustomInput>
-          <CustomButton label={"Create"} onClick={joinRoom} />
+          />
+          <CustomButton label={"Join"} onClick={joinRoom} />
         </>
       )}
     </>

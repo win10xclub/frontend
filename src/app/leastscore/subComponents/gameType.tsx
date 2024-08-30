@@ -9,11 +9,11 @@ const GameType = ({ setStepper }: any) => {
 
   return (
     <>
-      <CustomButton
+      {/* <CustomButton
         label={"Online Play"}
         style="primary"
         onClick={() => handleClick(3)} // Add +2 for Online Play
-      />
+      /> */}
       <div className="flex gap-4">
         <CustomButton
           label={"Create Room"}
