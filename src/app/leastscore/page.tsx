@@ -8,8 +8,9 @@ import GameBoardPage from "./subComponents/gameBoard";
 
 const LeastScorePage = () => {
   const [stepper, setStepper] = useState(0);
-
   const [socket, setSocket] = useState<WebSocket | null>(null);
+  const [tempFirst, setTempFirst] = useState()
+  const [fetchCards, setFetched] = useState()
 
   useEffect(() => {
     const newSocket = new WebSocket(`ws://localhost:8080`);
@@ -25,6 +26,11 @@ const LeastScorePage = () => {
       if (data.success === true) {
         localStorage.setItem("gameId", data.gameid);
         setStepper((prev: number) => prev + 1);
+      } else if(data.isStart){
+        setFetched(data.startGameResponse.users[0].cards);
+        setTempFirst(data.startGameResponse.firstCard)
+        setStepper(3);
+        console.log(data.startGameResponse.users[0].cards)
       } else if (data.type === "error") {
         console.error(data.message);
       }
@@ -59,13 +65,13 @@ const LeastScorePage = () => {
             <GameForm
               stepper={stepper}
               setStepper={setStepper}
-              socket={socket}  // Pass the socket prop here
+              socket={socket} // Pass the socket prop here
             />
           )}
           {stepper >= 2 && stepper < 3 && (
             <WaitingLobby setStepper={setStepper} socket={socket} />
           )}
-          {stepper === 3 && <GameBoardPage />}
+          {stepper === 3 && <GameBoardPage socket={socket} fetchCard={fetchCards} tempFirst={tempFirst}/>}
         </div>
       </div>
     </NavbarLayout>

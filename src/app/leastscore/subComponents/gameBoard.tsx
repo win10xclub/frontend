@@ -1,66 +1,61 @@
-import CustomButton from "@/components/CustomButton";
-import React, { useState, useEffect, useRef } from "react";
+"use client";
 
-const GameBoardPage = () => {
-  const [firstCard, setfirstCard] = useState(["1_5"]);
-  const [userCard, setUserCard] = useState(["0_3", "0_7", "3_2", "1_2", "2_5"]);
+import CustomButton from "@/components/CustomButton";
+import React, { useState, useEffect } from "react";
+
+interface GameBoardPageProps {
+  socket: WebSocket | null;
+  fetchCard: [];
+  tempFirst: string;
+}
+
+const GameBoardPage: React.FC<GameBoardPageProps> = ({ socket, fetchCard, tempFirst }) => {
+  const [firstCard, setfirstCard] = useState([tempFirst]);
+  const [userCard, setUserCard] = useState(fetchCard);
   const [type, setType] = useState("join");
   const [selectedCard, setSelectedCard] = useState({
     pickedFrom: "",
     pickedCard: "",
     discardedCard: "",
   });
-  //const cardContainerRef = useRef(null);
 
-  const [socket, setSocket] = useState<WebSocket | null>(null);
-
-  const username = "nikhil"; // Replace with actual username
+  const username = "kmr"; // Replace with actual username
   const gameId = "138FFP"; // Replace with actual game ID
 
   useEffect(() => {
-    const newSocket = new WebSocket("ws://localhost:8080");
-
-    newSocket.onopen = () => {
-      console.log("Connection established");
-      // Send a join message when connection is established
-      newSocket.send(JSON.stringify({ type: "join", username, gameId }));
-    };
-
-    newSocket.onmessage = (event) => {
-      const data = JSON.parse(event.data);
-      console.log("Message received:", data);
-
-      if (data.cards) {
-        setUserCard(data.cards);
-      }
-      if (data.play_deck) {
-        //setfirstCard(data.play_deck);
-      }
-      if (data.firstCard) {
-        setfirstCard([data.firstCard]);
-        // Handle firstCard if needed
-      }
-      if (data.error) {
-        console.error(data.error);
-      }
-    };
-
-    setSocket(newSocket);
-
-    return () => newSocket.close();
-  }, [username, gameId]);
-
-  useEffect(() => {
     if (socket) {
+      socket.onmessage = (event) => {
+        const data = JSON.parse(event.data);
+        console.log("Message received:", data);
+
+        if (data.cards) {
+          setUserCard(data.cards);
+        }
+        if (data.play_deck) {
+          //setfirstCard(data.play_deck);
+        }
+        if (data.firstCard) {
+          setfirstCard([data.firstCard]);
+          // Handle firstCard if needed
+        }
+        if (data.error) {
+          console.error(data.error);
+        }
+      };
+
       if (socket.readyState === WebSocket.OPEN) {
-        const message = { type, username, gameId, moveData: selectedCard };
-        socket.send(JSON.stringify(message));
-      } else {
-        // Optionally handle case where WebSocket is not open
-        console.log("WebSocket is not open. Cannot send message.");
+        const joinMessage = { type: "join", username, gameId: localStorage.getItem("gameId") };
+        socket.send(JSON.stringify(joinMessage));
       }
     }
-  }, [type, socket]);
+  }, [socket, username, gameId]);
+
+  useEffect(() => {
+    if (socket && socket.readyState === WebSocket.OPEN) {
+      const message = { type, username, gameId, moveData: selectedCard };
+      socket.send(JSON.stringify(message));
+    }
+  }, [type, socket, selectedCard]);
 
   const handleCardClick = (type, card) => {
     setSelectedCard((prevSelectedCard) => {
@@ -94,7 +89,6 @@ const GameBoardPage = () => {
         background:
           "radial-gradient(circle, rgba(35,133,35,1) 30%, rgba(22,54,37,1) 100%)",
       }}
-      //ref={cardContainerRef}
     >
       {/* exchange card div */}
       <div className="w-[100%] relative flex justify-between">
@@ -108,7 +102,6 @@ const GameBoardPage = () => {
                 style={{
                   top: selectedCard.pickedCard === card ? "-1.5rem" : "0",
                   left: window.innerWidth < 620 ? `${index * 1.5}rem` : `${index * 3}rem`,
-                  //zIndex: selectedCard === card ? "2" : "1",
                   transition: "top 0.2s ease-in-out",
                 }}
                 src={`/cards/${card}.svg`}
@@ -149,7 +142,6 @@ const GameBoardPage = () => {
                 style={{
                   top: selectedCard.discardedCard === card ? "-1.5rem" : "0rem",
                   left: window.innerWidth < 620 ? `${index * 1.5}rem` : `${index * 3}rem`,
-                  //zIndex: selectedCard === card ? "2" : "1",
                   transition: "top 0.2s ease-in-out",
                 }}
                 src={`/cards/${card}.svg`}
@@ -160,15 +152,14 @@ const GameBoardPage = () => {
           </div>
         </div>
 
-        {/* user card */}
-        <div className="mobile:w-[35%] relative flex self-end">
-          <div className="flex gap-[0.5rem] mobile:gap-[1rem] ml-auto">
-            <CustomButton label={"Swap"} onClick={() => setType("move")} />
-            <CustomButton
-              label={"Declare"}
-              onClick={() => setType("declare")}
-            />
-          </div>
+        {/* action button */}
+        <div className="w-[40%] mobile:w-[30%] flex items-end">
+          <CustomButton
+            type="primary"
+            label="Declare"
+            customClass="w-[100%] text-[14px] py-[0.25rem] px-[0.5rem] mobile:py-[0.5rem] mobile:px-[1rem] bg-primaryColor rounded-[6px] cursor-pointer"
+            onClick={() => setType("declare")}
+          />
         </div>
       </div>
     </div>
