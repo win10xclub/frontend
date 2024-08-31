@@ -59,7 +59,7 @@ const GameForm = ({ stepper, setStepper, socket }: any) => {
       const data = {
         type: "hostgame",
         hostData: selectedValue,
-        username: "YourUsername",
+        username: "kmr",
       };
       socket.send(JSON.stringify(data));
       console.log("Create room data sent to server:", data);
@@ -71,7 +71,7 @@ const GameForm = ({ stepper, setStepper, socket }: any) => {
       const data = {
         type: "joingame",
         joinData: code,
-        username: "YourUsername",
+        username: "kmr",
       };
       socket.send(JSON.stringify(data));
       console.log("Join room data sent to server:", data);
