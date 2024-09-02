@@ -35,8 +35,9 @@ const GameBoardPage: React.FC<GameBoardPageProps> = ({
         if (data.success == true) {
           setfirstCard(data.firstCard);
           
-          const newArray = userCard.filter((card) => card !== data.firstCard[0]); // firstCard
-          newArray.push(data.moveData.pickedCard);
+          const newArray = userCard.filter((card) => card !== data.firstCard[0]);
+          console.log("remoooo - ", data.firstCard[0])
+          newArray.push(data.exchangedCard);
           setUserCard(newArray);
         }
         if (data.play_deck) {
@@ -62,12 +63,21 @@ const GameBoardPage: React.FC<GameBoardPageProps> = ({
     }
   }, [socket, username]);
 
-  useEffect(() => {
+  // useEffect(() => {
+  //   if (socket && socket.readyState === WebSocket.OPEN) {
+  //     const message = { type, username, gameId: localStorage.getItem("gameId"), moveData: selectedCard };
+  //     socket.send(JSON.stringify(message));
+  //     console.log("send hogaya - " + type )
+  //   }
+  // }, [type, socket]);
+
+  const actions = (typePara:string) => {
     if (socket && socket.readyState === WebSocket.OPEN) {
-      const message = { type, username, gameId: localStorage.getItem("gameId"), moveData: selectedCard };
+      const message = { type: typePara, username, gameId: localStorage.getItem("gameId"), moveData: selectedCard };
       socket.send(JSON.stringify(message));
+      console.log("send hogaya - " + type )
     }
-  }, [type, socket]);
+  }
 
   const handleCardClick = (type, card) => {
     setSelectedCard((prevSelectedCard) => {
@@ -153,7 +163,7 @@ const GameBoardPage: React.FC<GameBoardPageProps> = ({
             {userCard.map((card, index) => (
               <img
                 key={card}
-                className="h-[6rem] mobile:h-[8rem] absolute cursor-pointer"
+                className="h-[6rem] mobile:h-[8rem] absolute rounded-[8px] cursor-pointer shadow-[1px_2px_15px_0px] shadow-[#5b5958]"
                 style={{
                   top: selectedCard.discardedCard === card ? "-1.5rem" : "0rem",
                   left:
@@ -176,14 +186,14 @@ const GameBoardPage: React.FC<GameBoardPageProps> = ({
             type="primary"
             label="Declare"
             customClass="w-[100%] text-[14px] py-[0.25rem] px-[0.5rem] mobile:py-[0.5rem] mobile:px-[1rem] bg-primaryColor rounded-[6px] cursor-pointer"
-            onClick={() => setType("declare")}
+            onClick={() => actions("declare")}
           />
 
           <CustomButton
             type="primary"
             label="Swap"
             customClass="w-[100%] text-[14px] py-[0.25rem] px-[0.5rem] mobile:py-[0.5rem] mobile:px-[1rem] bg-primaryColor rounded-[6px] cursor-pointer"
-            onClick={() => setType("move")}
+            onClick={() => actions("move")}
           />
         </div>
       </div>
