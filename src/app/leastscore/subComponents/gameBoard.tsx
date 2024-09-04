@@ -17,13 +17,20 @@ const GameBoardPage: React.FC<GameBoardPageProps> = ({
   const [firstCard, setfirstCard] = useState([tempFirst]);
   const [userCard, setUserCard] = useState(fetchCard);
   const [type, setType] = useState("join");
+  console.log(
+    "bolo -- ",
+    localStorage.getItem("turn") == localStorage.getItem("username")
+  );
+  const [isDisabled, setIsDisabled] = useState(
+    !(localStorage.getItem("turn") == localStorage.getItem("username"))
+  );
   const [selectedCard, setSelectedCard] = useState({
     pickedFrom: "",
     pickedCard: "",
     discardedCard: "",
   });
 
-  const username = "kmr"; // Replace with actual username
+  const username = localStorage.getItem("username"); // Replace with actual username
   //const gameId = "138FFP"; // Replace with actual game ID
 
   useEffect(() => {
@@ -31,22 +38,27 @@ const GameBoardPage: React.FC<GameBoardPageProps> = ({
       socket.onmessage = (event) => {
         const data = JSON.parse(event.data);
         console.log("Message received:", data);
-
+        if (
+          data.type === "playerTurn" &&
+          data.username === localStorage.getItem("username")
+        ) {
+          setIsDisabled(false);
+        }
         if (data.success == true) {
           setfirstCard(data.firstCard);
-          
-          const newArray = userCard.filter((card) => card !== data.firstCard[0]);
-          console.log("remoooo - ", data.firstCard[0])
-          newArray.push(data.exchangedCard);
-          setUserCard(newArray);
+
+          // Update userCard state
+          setUserCard((prevUserCard) => {
+            // Remove the first card(s) from the userCard array
+            const newArray = prevUserCard.filter(
+              (card) => !data.firstCard.includes(card)
+            );
+            // Add the exchange card to the userCard array
+            newArray.push(data.exchangeCard);
+            return newArray;
+          });
         }
-        if (data.play_deck) {
-          //setfirstCard(data.play_deck);
-        }
-        if (data.firstCard) {
-          setfirstCard([data.firstCard]);
-          // Handle firstCard if needed
-        }
+
         if (data.error) {
           console.error(data.error);
         }
@@ -63,21 +75,21 @@ const GameBoardPage: React.FC<GameBoardPageProps> = ({
     }
   }, [socket, username]);
 
-  // useEffect(() => {
-  //   if (socket && socket.readyState === WebSocket.OPEN) {
-  //     const message = { type, username, gameId: localStorage.getItem("gameId"), moveData: selectedCard };
-  //     socket.send(JSON.stringify(message));
-  //     console.log("send hogaya - " + type )
-  //   }
-  // }, [type, socket]);
+  console.log("Button disabled state:", isDisabled);
 
-  const actions = (typePara:string) => {
+  const actions = (typePara: string) => {
+    setIsDisabled(true);
     if (socket && socket.readyState === WebSocket.OPEN) {
-      const message = { type: typePara, username, gameId: localStorage.getItem("gameId"), moveData: selectedCard };
+      const message = {
+        type: typePara,
+        username,
+        gameId: localStorage.getItem("gameId"),
+        moveData: selectedCard,
+      };
       socket.send(JSON.stringify(message));
-      console.log("send hogaya - " + type )
+      console.log("send hogaya - " + type);
     }
-  }
+  };
 
   const handleCardClick = (type, card) => {
     setSelectedCard((prevSelectedCard) => {
@@ -181,21 +193,25 @@ const GameBoardPage: React.FC<GameBoardPageProps> = ({
         </div>
 
         {/* action button */}
-        <div className="w-[40%] mobile:w-[30%] flex items-end">
-          <CustomButton
-            type="primary"
-            label="Declare"
-            customClass="w-[100%] text-[14px] py-[0.25rem] px-[0.5rem] mobile:py-[0.5rem] mobile:px-[1rem] bg-primaryColor rounded-[6px] cursor-pointer"
-            onClick={() => actions("declare")}
-          />
+        
+          <div className="w-[40%] mobile:w-[30%] flex justify-end items-end gap-[1rem]">
+            <CustomButton
+              disabled={isDisabled}
+              type="primary"
+              label="Declare"
+              customClass="w-[100%] text-[14px] py-[0.25rem] px-[0.5rem] mobile:py-[0.5rem] mobile:px-[1rem] bg-primaryColor rounded-[6px] cursor-pointer"
+              onClick={() => actions("declare")}
+            />
 
-          <CustomButton
-            type="primary"
-            label="Swap"
-            customClass="w-[100%] text-[14px] py-[0.25rem] px-[0.5rem] mobile:py-[0.5rem] mobile:px-[1rem] bg-primaryColor rounded-[6px] cursor-pointer"
-            onClick={() => actions("move")}
-          />
-        </div>
+            <CustomButton
+              disabled={isDisabled}
+              type="primary"
+              label="Swap"
+              customClass="w-[100%] text-[14px] py-[0.25rem] px-[0.5rem] mobile:py-[0.5rem] mobile:px-[1rem] bg-primaryColor rounded-[6px] cursor-pointer"
+              onClick={() => actions("move")}
+            />
+          </div>
+      
       </div>
     </div>
   );

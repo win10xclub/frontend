@@ -23,6 +23,9 @@ const LeastScorePage = () => {
       const data = JSON.parse(event.data);
       console.log("Response received:", data);
 
+      if (data.type === "playerTurn") {
+        localStorage.setItem("turn", data.username)
+      }
       if (data.success === true) {
         if (data.isStart) {
           setFetched(data.startGameResponse.users[0].cards);
