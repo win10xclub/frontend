@@ -17,10 +17,7 @@ const GameBoardPage: React.FC<GameBoardPageProps> = ({
   const [firstCard, setfirstCard] = useState([tempFirst]);
   const [userCard, setUserCard] = useState(fetchCard);
   const [type, setType] = useState("join");
-  console.log(
-    "bolo -- ",
-    localStorage.getItem("turn") == localStorage.getItem("username")
-  );
+  const [showResult, setShowResult] = useState();
   const [isDisabled, setIsDisabled] = useState(
     !(localStorage.getItem("turn") == localStorage.getItem("username"))
   );
@@ -44,7 +41,13 @@ const GameBoardPage: React.FC<GameBoardPageProps> = ({
         ) {
           setIsDisabled(false);
         }
-        if (data.success == true) {
+
+        if (data.type == "declareResult") {
+          setShowResult({
+            winnerUsername: data.minUser.username,
+            sum: data.minUser.sum,
+          });
+        } else if (data.success == true) {
           setfirstCard(data.firstCard);
 
           // Update userCard state
@@ -124,6 +127,12 @@ const GameBoardPage: React.FC<GameBoardPageProps> = ({
           "radial-gradient(circle, rgba(35,133,35,1) 30%, rgba(22,54,37,1) 100%)",
       }}
     >
+      {showResult && (
+        <div>
+          Table Winner : {showResult.winnerUsername} <br></br> with sum of{" "}
+          {showResult.sum}
+        </div>
+      )}
       {/* exchange card div */}
       <div className="w-[100%] relative flex justify-between">
         {/* recent swapped card */}
@@ -193,25 +202,24 @@ const GameBoardPage: React.FC<GameBoardPageProps> = ({
         </div>
 
         {/* action button */}
-        
-          <div className="w-[40%] mobile:w-[30%] flex justify-end items-end gap-[1rem]">
-            <CustomButton
-              disabled={isDisabled}
-              type="primary"
-              label="Declare"
-              customClass="w-[100%] text-[14px] py-[0.25rem] px-[0.5rem] mobile:py-[0.5rem] mobile:px-[1rem] bg-primaryColor rounded-[6px] cursor-pointer"
-              onClick={() => actions("declare")}
-            />
 
-            <CustomButton
-              disabled={isDisabled}
-              type="primary"
-              label="Swap"
-              customClass="w-[100%] text-[14px] py-[0.25rem] px-[0.5rem] mobile:py-[0.5rem] mobile:px-[1rem] bg-primaryColor rounded-[6px] cursor-pointer"
-              onClick={() => actions("move")}
-            />
-          </div>
-      
+        <div className="w-[40%] mobile:w-[30%] flex justify-end items-end gap-[1rem]">
+          <CustomButton
+            disabled={isDisabled}
+            type="primary"
+            label="Declare"
+            customClass="w-[100%] text-[14px] py-[0.25rem] px-[0.5rem] mobile:py-[0.5rem] mobile:px-[1rem] bg-primaryColor rounded-[6px] cursor-pointer"
+            onClick={() => actions("declare")}
+          />
+
+          <CustomButton
+            disabled={isDisabled}
+            type="primary"
+            label="Swap"
+            customClass="w-[100%] text-[14px] py-[0.25rem] px-[0.5rem] mobile:py-[0.5rem] mobile:px-[1rem] bg-primaryColor rounded-[6px] cursor-pointer"
+            onClick={() => actions("move")}
+          />
+        </div>
       </div>
     </div>
   );
