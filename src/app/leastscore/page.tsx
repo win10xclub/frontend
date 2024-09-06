@@ -23,7 +23,7 @@ const LeastScorePage = () => {
   };
 
   useEffect(() => {
-    const newSocket = new WebSocket(`ws://localhost:8080`);
+    const newSocket = new WebSocket(`ws://${process.env.NEXT_PUBLIC_GAMEROOM_API_URL}`);
 
     newSocket.onopen = () => {
       console.log("WebSocket connection established");
