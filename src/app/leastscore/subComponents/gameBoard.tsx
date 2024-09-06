@@ -5,8 +5,19 @@ import React, { useState, useEffect } from "react";
 
 interface GameBoardPageProps {
   socket: WebSocket | null;
-  fetchCard: [];
+  fetchCard: string[];
   tempFirst: string;
+}
+
+interface SelectedCard {
+  pickedFrom: string;
+  pickedCard: string;
+  discardedCard: string;
+}
+
+interface ShowResult {
+  winnerUsername: string;
+  sum: number;
 }
 
 const GameBoardPage: React.FC<GameBoardPageProps> = ({
@@ -14,49 +25,59 @@ const GameBoardPage: React.FC<GameBoardPageProps> = ({
   fetchCard,
   tempFirst,
 }) => {
-  const [firstCard, setfirstCard] = useState([tempFirst]);
+  const [firstCard, setFirstCard] = useState([tempFirst]);
   const [userCard, setUserCard] = useState(fetchCard);
-  const [type, setType] = useState("join");
-  const [showResult, setShowResult] = useState();
-  const [isDisabled, setIsDisabled] = useState(
-    !(localStorage.getItem("turn") == localStorage.getItem("username"))
-  );
-  const [selectedCard, setSelectedCard] = useState({
+  const [isDisabled, setIsDisabled] = useState(false);
+  const [selectedCard, setSelectedCard] = useState<SelectedCard>({
     pickedFrom: "",
     pickedCard: "",
     discardedCard: "",
   });
+  const [showResult, setShowResult] = useState<ShowResult | null>(null);
 
-  const username = localStorage.getItem("username"); // Replace with actual username
-  //const gameId = "138FFP"; // Replace with actual game ID
+  // Helper to safely access localStorage
+  const getFromLocalStorage = (key: string) => {
+    if (typeof window !== "undefined") {
+      return localStorage.getItem(key);
+    }
+    return null;
+  };
+
+  const username = getFromLocalStorage("username");
+  const gameId = getFromLocalStorage("gameId");
+
+  useEffect(() => {
+    setIsDisabled(
+      !(getFromLocalStorage("turn") === getFromLocalStorage("username"))
+    );
+  }, []);
 
   useEffect(() => {
     if (socket) {
       socket.onmessage = (event) => {
         const data = JSON.parse(event.data);
         console.log("Message received:", data);
-        if (
-          data.type === "playerTurn" &&
-          data.username === localStorage.getItem("username")
-        ) {
+
+        if (data.type === "playerTurn" && data.username === username) {
           setIsDisabled(false);
         }
 
-        if (data.type == "declareResult") {
+        if (data.type === "declareResult") {
           setShowResult({
             winnerUsername: data.minUser.username,
             sum: data.minUser.sum,
           });
-        } else if (data.success == true) {
-          setfirstCard(data.firstCard);
+          setTimeout(() => {
+            window.location.reload();
+          }, 10000);
+        } else if (data.success) {
+          setFirstCard(data.firstCard);
 
           // Update userCard state
           setUserCard((prevUserCard) => {
-            // Remove the first card(s) from the userCard array
             const newArray = prevUserCard.filter(
               (card) => !data.firstCard.includes(card)
             );
-            // Add the exchange card to the userCard array
             newArray.push(data.exchangeCard);
             return newArray;
           });
@@ -71,12 +92,12 @@ const GameBoardPage: React.FC<GameBoardPageProps> = ({
         const joinMessage = {
           type: "join",
           username,
-          gameId: localStorage.getItem("gameId"),
+          gameId,
         };
         socket.send(JSON.stringify(joinMessage));
       }
     }
-  }, [socket, username]);
+  }, [socket, username, gameId]);
 
   console.log("Button disabled state:", isDisabled);
 
@@ -86,15 +107,15 @@ const GameBoardPage: React.FC<GameBoardPageProps> = ({
       const message = {
         type: typePara,
         username,
-        gameId: localStorage.getItem("gameId"),
+        gameId,
         moveData: selectedCard,
       };
       socket.send(JSON.stringify(message));
-      console.log("send hogaya - " + type);
+      console.log("Message sent - " + typePara);
     }
   };
 
-  const handleCardClick = (type, card) => {
+  const handleCardClick = (type: string, card: string) => {
     setSelectedCard((prevSelectedCard) => {
       if (type === "deck") {
         return prevSelectedCard.pickedFrom === "deck"
@@ -121,18 +142,19 @@ const GameBoardPage: React.FC<GameBoardPageProps> = ({
 
   return (
     <div
-      className="w-full h-[18rem] mobile:h-[25rem] rounded-[12px] flex flex-col justify-between items-start flex-wrap p-[1rem] gap-[1rem]"
+      className="relative w-full h-[18rem] mobile:h-[25rem] rounded-[12px] flex flex-col justify-between items-start flex-wrap p-[1rem] gap-[1rem]"
       style={{
         background:
           "radial-gradient(circle, rgba(35,133,35,1) 30%, rgba(22,54,37,1) 100%)",
       }}
     >
       {showResult && (
-        <div>
-          Table Winner : {showResult.winnerUsername} <br></br> with sum of{" "}
-          {showResult.sum}
+        <div className="absolute z-50 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-secnColor rounded-md p-[1rem] ">
+          Table Winner : {showResult.winnerUsername} <br />
+          with sum of {showResult.sum}
         </div>
       )}
+
       {/* exchange card div */}
       <div className="w-[100%] relative flex justify-between">
         {/* recent swapped card */}
@@ -160,7 +182,7 @@ const GameBoardPage: React.FC<GameBoardPageProps> = ({
 
         {/* deck card */}
         <div className="w-[30%] relative flex">
-          <div className="">
+          <div>
             <img
               className="h-[6rem] mobile:h-[8rem] ml-auto absolute cursor-pointer right-0 rounded-[6px]"
               style={{
@@ -170,12 +192,13 @@ const GameBoardPage: React.FC<GameBoardPageProps> = ({
                 transition: "top 0.2s ease-in-out",
               }}
               src={`/cards/back.png`}
-              alt={`Card`}
+              alt="Card"
               onClick={() => handleCardClick("deck", "deck")}
             />
           </div>
         </div>
       </div>
+
       {/* user card and action button div */}
       <div className="w-[100%] flex justify-between">
         {/* user card */}
@@ -201,22 +224,16 @@ const GameBoardPage: React.FC<GameBoardPageProps> = ({
           </div>
         </div>
 
-        {/* action button */}
-
+        {/* action buttons */}
         <div className="w-[40%] mobile:w-[30%] flex justify-end items-end gap-[1rem]">
           <CustomButton
             disabled={isDisabled}
-            type="primary"
             label="Declare"
-            customClass="w-[100%] text-[14px] py-[0.25rem] px-[0.5rem] mobile:py-[0.5rem] mobile:px-[1rem] bg-primaryColor rounded-[6px] cursor-pointer"
             onClick={() => actions("declare")}
           />
-
           <CustomButton
             disabled={isDisabled}
-            type="primary"
             label="Swap"
-            customClass="w-[100%] text-[14px] py-[0.25rem] px-[0.5rem] mobile:py-[0.5rem] mobile:px-[1rem] bg-primaryColor rounded-[6px] cursor-pointer"
             onClick={() => actions("move")}
           />
         </div>

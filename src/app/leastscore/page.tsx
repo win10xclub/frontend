@@ -11,6 +11,7 @@ const LeastScorePage = () => {
   const [socket, setSocket] = useState<WebSocket | null>(null);
   const [tempFirst, setTempFirst] = useState();
   const [fetchCards, setFetched] = useState();
+  const [players, setPlayers] = useState()
 
   useEffect(() => {
     const newSocket = new WebSocket(`ws://localhost:8080`);
@@ -25,6 +26,9 @@ const LeastScorePage = () => {
 
       if (data.type === "playerTurn") {
         localStorage.setItem("turn", data.username)
+      }
+      if(data.type == "lobbyUpdate"){
+        setPlayers(data.players)
       }
       if (data.success === true) {
         if (data.isStart) {
@@ -74,13 +78,14 @@ const LeastScorePage = () => {
             />
           )}
           {stepper >= 2 && stepper < 3 && (
-            <WaitingLobby setStepper={setStepper} socket={socket} />
+            <WaitingLobby setStepper={setStepper} socket={socket} players={players}/>
           )}
           {stepper === 3 && (
             <GameBoardPage
               socket={socket}
               fetchCard={fetchCards}
               tempFirst={tempFirst}
+              players={players}
             />
           )}
         </div>
