@@ -31,6 +31,7 @@ function AuthPage() {
 
   const handleAuth = async () => {
     try {
+      console.log("enter")
       const url =
         authType === "signin"
           ? `http://${process.env.NEXT_PUBLIC_AUTH_API_URL}/api/user/signin`
@@ -53,6 +54,7 @@ function AuthPage() {
         `${authType === "signin" ? "Signin" : "Signup"} successful:`,
         response.data
       );
+      localStorage.setItem("username",formDetails.username);
       setOtpVisible(true);
     } catch (error) {
       console.error(
