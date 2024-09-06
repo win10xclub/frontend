@@ -1,4 +1,5 @@
 "use client";
+
 import NavbarLayout from "@/components/NavbarLayout";
 import React, { useEffect, useState } from "react";
 import GameType from "./subComponents/gameType";
@@ -9,9 +10,17 @@ import GameBoardPage from "./subComponents/gameBoard";
 const LeastScorePage = () => {
   const [stepper, setStepper] = useState(0);
   const [socket, setSocket] = useState<WebSocket | null>(null);
-  const [tempFirst, setTempFirst] = useState();
-  const [fetchCards, setFetched] = useState();
-  const [players, setPlayers] = useState()
+  const [tempFirst, setTempFirst] = useState<string | undefined>();
+  const [fetchCards, setFetched] = useState<string[] | undefined>();
+  const [players, setPlayers] = useState<any[]>([]);
+
+  // Helper function to safely access localStorage
+  const getFromLocalStorage = (key: string) => {
+    if (typeof window !== "undefined") {
+      return localStorage.getItem(key);
+    }
+    return null;
+  };
 
   useEffect(() => {
     const newSocket = new WebSocket(`ws://localhost:8080`);
@@ -25,19 +34,26 @@ const LeastScorePage = () => {
       console.log("Response received:", data);
 
       if (data.type === "playerTurn") {
-        localStorage.setItem("turn", data.username)
+        if (typeof window !== "undefined") {
+          localStorage.setItem("turn", data.username);
+        }
+        console.log("hii ",data.userCards)
+        setFetched(data.userCards);
       }
-      if(data.type == "lobbyUpdate"){
-        setPlayers(data.players)
+
+      if (data.type === "lobbyUpdate") {
+        setPlayers(data.players);
       }
+
       if (data.success === true) {
         if (data.isStart) {
-          setFetched(data.startGameResponse.users[0].cards);
+          //setFetched(data.startGameResponse.users[0].cards);
           setTempFirst(data.startGameResponse.firstCard);
           setStepper(3);
-          console.log(data.startGameResponse.users[0].cards);
         } else {
-          localStorage.setItem("gameId", data.gameid);
+          if (typeof window !== "undefined") {
+            localStorage.setItem("gameId", data.gameid);
+          }
           setStepper((prev: number) => prev + 1);
         }
       } else if (data.type === "error") {
@@ -69,23 +85,22 @@ const LeastScorePage = () => {
         </div>
 
         <div className="relative w-full bg-secnColor min-h-[10rem] rounded-[1rem] flex flex-col justify-center items-center gap-4 p-[0.25rem] mobile:p-[1rem]">
-          {stepper === 0 && <GameType setStepper={setStepper}></GameType>}
+          {stepper === 0 && <GameType setStepper={setStepper} />}
+
           {(stepper === 1.1 || stepper === 1.2) && (
-            <GameForm
-              stepper={stepper}
-              setStepper={setStepper}
-              socket={socket} // Pass the socket prop here
-            />
+            <GameForm stepper={stepper} setStepper={setStepper} socket={socket} />
           )}
+
           {stepper >= 2 && stepper < 3 && (
-            <WaitingLobby setStepper={setStepper} socket={socket} players={players}/>
+            <WaitingLobby setStepper={setStepper} socket={socket} players={players} />
           )}
+
           {stepper === 3 && (
             <GameBoardPage
               socket={socket}
-              fetchCard={fetchCards}
-              tempFirst={tempFirst}
-              players={players}
+              fetchCard={fetchCards || []}
+              tempFirst={tempFirst || ""}
+              //players={players}
             />
           )}
         </div>

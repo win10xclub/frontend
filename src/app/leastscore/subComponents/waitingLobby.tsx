@@ -4,7 +4,7 @@ import CustomButton from "@/components/CustomButton";
 import React, { useEffect, useState } from "react";
 
 interface WaitingLobbyProps {
-  socket: WebSocket;
+  socket: WebSocket | null;
   setStepper: React.Dispatch<React.SetStateAction<number>>;
   players?: string[];  // Array of player names as strings
 }

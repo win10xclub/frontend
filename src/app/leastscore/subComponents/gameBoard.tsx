@@ -35,6 +35,13 @@ const GameBoardPage: React.FC<GameBoardPageProps> = ({
   });
   const [showResult, setShowResult] = useState<ShowResult | null>(null);
 
+  useEffect(() => {
+    // Update userCard when fetchCard changes
+    setUserCard(fetchCard);
+  }, [fetchCard]);
+
+  console.log("hame - ", userCard);
+
   // Helper to safely access localStorage
   const getFromLocalStorage = (key: string) => {
     if (typeof window !== "undefined") {
@@ -74,13 +81,15 @@ const GameBoardPage: React.FC<GameBoardPageProps> = ({
           setFirstCard(data.firstCard);
 
           // Update userCard state
-          setUserCard((prevUserCard) => {
-            const newArray = prevUserCard.filter(
-              (card) => !data.firstCard.includes(card)
-            );
-            newArray.push(data.exchangeCard);
-            return newArray;
-          });
+          if (data.username == username) {
+            setUserCard((prevUserCard) => {
+              const newArray = prevUserCard.filter(
+                (card) => !data.firstCard.includes(card)
+              );
+              newArray.push(data.exchangeCard);
+              return newArray;
+            });
+          }
         }
 
         if (data.error) {
@@ -98,8 +107,6 @@ const GameBoardPage: React.FC<GameBoardPageProps> = ({
       }
     }
   }, [socket, username, gameId]);
-
-  console.log("Button disabled state:", isDisabled);
 
   const actions = (typePara: string) => {
     setIsDisabled(true);

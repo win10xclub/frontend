@@ -13,9 +13,6 @@ const CustomButton: React.FC<CustomButtonProps> = ({
   style,
   disabled,
 }) => {
-
-  console.log("bhaiiii -- ", disabled)
-
   return (
     <button
       disabled={disabled}

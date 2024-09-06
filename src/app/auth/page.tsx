@@ -6,10 +6,10 @@ import CustomButton from "@/components/CustomButton";
 import Link from "next/link";
 import CustomCheckBox from "@/components/CustomCheckBox";
 import NavbarLayout from "@/components/NavbarLayout";
-import { useRouter, useSearchParams } from "next/navigation";
-import { PassThrough } from "stream";
+import { useRouter } from "next/navigation";
 
 function AuthPage() {
+  const router = useRouter();
   const [formDetails, setFormDetails] = useState({
     username: "",
     email: "",
@@ -18,15 +18,7 @@ function AuthPage() {
   });
   const [rememberMe, setRememberMe] = useState(false);
   const [otpVisible, setOtpVisible] = useState(false);
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const authType = searchParams.get("type");
-
-  useEffect(() => {
-    if (authType !== "signin" && authType !== "signup") {
-      router.push("/"); // Redirect if type is invalid
-    }
-  }, [authType, router]);
+  const [authType, setAuthType] = useState("signin");
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target;
@@ -159,22 +151,22 @@ function AuthPage() {
       {authType === "signin" ? (
         <>
           Not registered?{" "}
-          <Link
-            className="underline text-accColor pl-2"
-            href="/auth?type=signup"
+          <span
+            className="underline text-accColor pl-2 cursor-pointer"
+            onClick={() => setAuthType("signup")}
           >
             Create account
-          </Link>
+          </span>
         </>
       ) : (
         <>
           Already have an account?{" "}
-          <Link
-            className="underline text-accColor pl-2"
-            href="/auth?type=signin"
+          <span
+            className="underline text-accColor pl-2 cursor-pointer"
+            onClick={() => setAuthType("signin")}
           >
             Log in
-          </Link>
+          </span>
         </>
       )}
     </p>
