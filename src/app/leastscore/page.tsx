@@ -11,7 +11,7 @@ const LeastScorePage = () => {
   const [stepper, setStepper] = useState(0);
   const [socket, setSocket] = useState<WebSocket | null>(null);
   const [tempFirst, setTempFirst] = useState<string | undefined>();
-  const [fetchCards, setFetched] = useState<string[] | undefined>();
+  const [fetchCards, setFetched] = useState<string[] | null>();
   const [players, setPlayers] = useState<any[]>([]);
 
   // Helper function to safely access localStorage
@@ -23,7 +23,9 @@ const LeastScorePage = () => {
   };
 
   useEffect(() => {
-    const newSocket = new WebSocket(`ws://${process.env.NEXT_PUBLIC_GAMEROOM_API_URL}`);
+    const newSocket = new WebSocket(
+      `ws://${process.env.NEXT_PUBLIC_GAMEROOM_API_URL}`
+    );
 
     newSocket.onopen = () => {
       console.log("WebSocket connection established");
@@ -37,7 +39,7 @@ const LeastScorePage = () => {
         if (typeof window !== "undefined") {
           localStorage.setItem("turn", data.username);
         }
-        console.log("hii ",data.userCards)
+        console.log("hii ", data.userCards);
         setFetched(data.userCards);
       }
 
@@ -88,14 +90,22 @@ const LeastScorePage = () => {
           {stepper === 0 && <GameType setStepper={setStepper} />}
 
           {(stepper === 1.1 || stepper === 1.2) && (
-            <GameForm stepper={stepper} setStepper={setStepper} socket={socket} />
+            <GameForm
+              stepper={stepper}
+              setStepper={setStepper}
+              socket={socket}
+            />
           )}
 
           {stepper >= 2 && stepper < 3 && (
-            <WaitingLobby setStepper={setStepper} socket={socket} players={players} />
+            <WaitingLobby
+              setStepper={setStepper}
+              socket={socket}
+              players={players}
+            />
           )}
 
-          {stepper === 3 && (
+          {stepper === 3 && (fetchCards?.length ?? 0) > 0 && (
             <GameBoardPage
               socket={socket}
               fetchCard={fetchCards || []}
