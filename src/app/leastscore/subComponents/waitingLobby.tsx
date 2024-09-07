@@ -35,6 +35,7 @@ const WaitingLobby: React.FC<WaitingLobbyProps> = ({ socket, setStepper, players
       {players?.map((player, index) => (
         <p key={index}>{player}</p>
       ))}
+      {gameId}
     </>
   );
 };
