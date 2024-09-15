@@ -8,7 +8,7 @@ import React, { useState, useEffect } from "react";
 
 const GameForm = ({ stepper, setStepper, socket }: any) => {
   const [selectedValue, setSelectedValue] = useState({
-    game_type: "",
+    game_type: "knockout",
     timer: "30",
     game_mode: "public",
     score: "50",

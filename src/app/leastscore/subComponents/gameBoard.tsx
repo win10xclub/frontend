@@ -65,35 +65,51 @@ const GameBoardPage: React.FC<GameBoardPageProps> = ({
         const data = JSON.parse(event.data);
         console.log("Message received:", data);
 
-        if (data.type === "playerTurn" && data.username === username) {
-          setIsDisabled(false);
-        }
-
-        if (data.type === "declareResult") {
-          setShowResult({
-            winnerUsername: data.minUser.username,
-            sum: data.minUser.sum,
-          });
-          // setTimeout(() => {
-          //   window.location.reload();
-          // }, 10000);
-          
-        } else if (data.success) {
-          setFirstCard(data.firstCard);
-
-          // Update userCard state
-          if (data.username == username) {
-            setUserCard((prevUserCard) => {
-              const newArray = prevUserCard.filter(
-                (card) => !data.firstCard.includes(card)
-              );
-              newArray.push(data.exchangeCard);
-              return newArray;
+        // if (data.status == "success") {
+        //   if (data.type == "declareResult") {
+        //     setShowResult({
+        //       winnerUsername: data.data.minUser.username,
+        //       sum: data.data.minUser.sum,
+        //     });
+        //     // setTimeout(() => {
+        //     //   window.location.reload();
+        //     // }, 10000);
+        //   }
+        // }
+        if (data.status == "success") {
+          if (data.type == "declareResult") {
+            setShowResult({
+              winnerUsername: data.data.minUser.username,
+              sum: data.data.minUser.sum,
             });
-          }
-        }
+            // setTimeout(() => {
+            //   window.location.reload();
+            // }, 10000);
+          } else {
+            setFirstCard(data.data.firstCard);
 
-        if (data.error) {
+            console.log(
+              data.data.firstCard[0],
+              " -- ",
+              data.data.exchangeCard[0]
+            );
+
+            if (data.data.nextPlayer == username) {
+              setIsDisabled(false);
+            }
+
+            // Update userCard state
+            if (data.data.username == username) {
+              setUserCard((prevUserCard) => {
+                const newArray = prevUserCard.filter(
+                  (card) => !data.data.firstCard.includes(card)
+                );
+                newArray.push(data.data.exchangeCard[0]);
+                return newArray;
+              });
+            }
+          }
+        } else {
           console.error(data.error);
         }
       };

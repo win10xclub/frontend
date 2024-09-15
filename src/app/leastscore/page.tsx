@@ -35,15 +35,13 @@ const LeastScorePage = () => {
       const data = JSON.parse(event.data);
       console.log("Response received:", data);
 
-      if (data.type === "playerTurn") {
-        if (typeof window !== "undefined") {
-          localStorage.setItem("turn", data.username);
-        }
-        console.log("hii ", data.userCards);
-        setFetched(data.userCards);
-      }
-
-
+      // if (data.type === "playerTurn") {
+      //   if (typeof window !== "undefined") {
+      //     localStorage.setItem("turn", data.username);
+      //   }
+      //   console.log("hii ", data.userCards);
+      //   setFetched(data.userCards);
+      // }
 
       if (data.status == "success") {
         if (data.type == "hostgame") {
@@ -60,9 +58,11 @@ const LeastScorePage = () => {
           setPlayers(data.data.players);
         }
 
-        if (data.isStart) {
+        if (data.type == "gameStart") {
+          console.log(data);
           //setFetched(data.startGameResponse.users[0].cards);
-          setTempFirst(data.startGameResponse.firstCard);
+          setTempFirst(data.data.firstCard);
+          setFetched(data.data.userCards);
           setStepper(3);
         }
       } else if (data.type === "error") {
