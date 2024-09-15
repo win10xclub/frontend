@@ -74,9 +74,10 @@ const GameBoardPage: React.FC<GameBoardPageProps> = ({
             winnerUsername: data.minUser.username,
             sum: data.minUser.sum,
           });
-          setTimeout(() => {
-            window.location.reload();
-          }, 10000);
+          // setTimeout(() => {
+          //   window.location.reload();
+          // }, 10000);
+          
         } else if (data.success) {
           setFirstCard(data.firstCard);
 

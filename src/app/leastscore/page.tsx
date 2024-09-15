@@ -43,20 +43,27 @@ const LeastScorePage = () => {
         setFetched(data.userCards);
       }
 
-      if (data.type === "lobbyUpdate") {
-        setPlayers(data.players);
-      }
 
-      if (data.success === true) {
+
+      if (data.status == "success") {
+        if (data.type == "hostgame") {
+          localStorage.setItem("gameId", data.data.gameId);
+          setStepper((prev: number) => prev + 1);
+        }
+
+        if (data.type == "joingame") {
+          localStorage.setItem("gameId", data.data.gameId);
+          setStepper((prev: number) => prev + 1);
+        }
+
+        if (data.type === "lobbyUpdate") {
+          setPlayers(data.data.players);
+        }
+
         if (data.isStart) {
           //setFetched(data.startGameResponse.users[0].cards);
           setTempFirst(data.startGameResponse.firstCard);
           setStepper(3);
-        } else {
-          if (typeof window !== "undefined") {
-            localStorage.setItem("gameId", data.gameid);
-          }
-          setStepper((prev: number) => prev + 1);
         }
       } else if (data.type === "error") {
         console.error(data.message);
