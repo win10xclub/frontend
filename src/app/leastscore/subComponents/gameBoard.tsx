@@ -85,6 +85,17 @@ const GameBoardPage: React.FC<GameBoardPageProps> = ({
             // setTimeout(() => {
             //   window.location.reload();
             // }, 10000);
+          } else if (data.type == "gameStart") {
+
+            setShowResult(null);
+            setFirstCard([data.data.firstCard]);
+            console.log(data.data.firstCard[0], " -- ", data.data.firstCard);
+            setUserCard(data.data.userCards);
+
+            if (data.data.currentTurn == username) {
+              setIsDisabled(false);
+            }
+
           } else {
             setFirstCard(data.data.firstCard);
 
