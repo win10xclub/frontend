@@ -61,6 +61,7 @@ const LeastScorePage = () => {
         if (data.type == "gameStart") {
           console.log(data);
           //setFetched(data.startGameResponse.users[0].cards);
+          localStorage.setItem("turn", data.data.currentTurn)
           setTempFirst(data.data.firstCard);
           setFetched(data.data.userCards);
           setStepper(3);

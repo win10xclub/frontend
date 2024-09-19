@@ -88,22 +88,17 @@ const GameBoardPage: React.FC<GameBoardPageProps> = ({
           } else if (data.type == "gameStart") {
 
             setShowResult(null);
-            setFirstCard([data.data.firstCard]);
-            console.log(data.data.firstCard[0], " -- ", data.data.firstCard);
+            setFirstCard(data.data.firstCard);
+            console.log(data.data.firstCard, " -- ", data.data.firstCard);
             setUserCard(data.data.userCards);
 
             if (data.data.currentTurn == username) {
               setIsDisabled(false);
             }
 
-          } else {
-            setFirstCard(data.data.firstCard);
+          } else if (data.type == "move") {
 
-            console.log(
-              data.data.firstCard[0],
-              " -- ",
-              data.data.exchangeCard[0]
-            );
+            setFirstCard(data.data.firstCard);
 
             if (data.data.nextPlayer == username) {
               setIsDisabled(false);
